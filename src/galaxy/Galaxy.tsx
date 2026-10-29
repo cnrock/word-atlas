@@ -242,16 +242,16 @@ export function Galaxy({
     const i = eng.pick(p.x, p.y, e.pointerType === "mouse" ? 16 : 26);
     if (i < 0) return;
     const ref = atlas.words[i];
-    if (e.pointerType !== "mouse" && hover?.ref.id !== ref.id) {
-      // First tap previews, second tap opens.
-      eng.hover = i;
-      setHover({ ref, x: p.x, y: p.y });
-      if (store.get().settings.sfx) void cue("twinkle");
-      return;
-    }
     eng.flyTo(i);
     if (store.get().settings.sfx) void cue("fly");
-    window.setTimeout(() => openWord(ref.id), 350);
+    // Touch has no stable hover state. Open on the first completed tap;
+    // delaying navigation lets the preview disappear before the sheet opens.
+    openWord(ref.id);
+  };
+
+  const onCancel = (e: React.PointerEvent) => {
+    pointers.current.delete(e.pointerId);
+    drag.current = null;
   };
 
   const onWheel = (e: React.WheelEvent) => {
@@ -286,7 +286,7 @@ export function Galaxy({
         onPointerMove={onMove}
         onPointerDown={onDown}
         onPointerUp={onUp}
-        onPointerCancel={onUp}
+        onPointerCancel={onCancel}
         onPointerLeave={() => {
           if (engine.current) engine.current.hover = -1;
           setHover(null);

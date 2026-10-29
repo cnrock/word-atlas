@@ -42,6 +42,8 @@ public final class MainActivity extends Activity {
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         web = new WebView(this);
+        // Target 35+ draws edge-to-edge; keep the offline UI within system bars.
+        web.setFitsSystemWindows(true);
         web.setBackgroundColor(Color.rgb(246, 244, 237));
         WebSettings settings = web.getSettings();
         settings.setJavaScriptEnabled(true);

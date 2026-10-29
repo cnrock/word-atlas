@@ -16,12 +16,12 @@ export function About() {
           <p className="lede">
             词光把雅思阅读 8000 词整理成 {atlas.count.toLocaleString()} 个词条。每个词一幅原创插画，一句日常例句，一句雅思例句，配英美发音、常用搭配和易混提示。学会一个，就在你的星图上点亮一颗星。
           </p>
-          <p className="lede">它免费、开源、无需注册。代码用 MIT，词库用 CC BY 4.0，谁都可以拿去用。</p>
+          <p className="lede">它免费、开源、无需注册。代码用 MIT，词库按原项目声明采用 CC BY 4.0；复用时请保留原作者署名和授权说明。</p>
           <div className="about-actions">
-            <a className="btn btn-primary" href={REPO_URL} target="_blank" rel="noreferrer">
+            <a className="btn btn-primary" href={REPO_URL} target={location.hostname === "appassets.androidplatform.net" ? undefined : "_blank"} rel="noreferrer">
               <Github size={18} /> 在 GitHub 上查看
             </a>
-            <a className="btn btn-ghost" href={`${REPO_URL}/tree/main/data`} target="_blank" rel="noreferrer">
+            <a className="btn btn-ghost" href={`${REPO_URL}/tree/main/data`} target={location.hostname === "appassets.androidplatform.net" ? undefined : "_blank"} rel="noreferrer">
               <Database size={18} /> 下载词库 JSON / CSV
             </a>
           </div>
@@ -100,7 +100,7 @@ export function About() {
           <p className="muted">
             <code>data/word-atlas.json</code> 和 <code>.csv</code> 是完整词库；<code>public/atlas</code> 里是网页用的分块数据、插画和音频。拿去做 Anki 牌组、背词小程序、浏览器插件，或者 AI 应用的评测集，署名即可。
           </p>
-          <a className="link" href={`${REPO_URL}#readme`} target="_blank" rel="noreferrer">
+          <a className="link" href={`${REPO_URL}#readme`} target={location.hostname === "appassets.androidplatform.net" ? undefined : "_blank"} rel="noreferrer">
             阅读文档 <ArrowUpRight size={14} />
           </a>
         </section>

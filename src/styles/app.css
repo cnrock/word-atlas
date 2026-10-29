@@ -1997,6 +1997,24 @@ code {
   font-size: 13px;
   font-variant-numeric: tabular-nums;
 }
+.galaxy-search-results {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  max-height: 128px;
+  overflow-y: auto;
+}
+.galaxy-search-results .chip-btn {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.galaxy-search-results p {
+  color: var(--ink-3);
+}
 .vgrid,
 .vlist {
   position: relative;

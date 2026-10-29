@@ -9,3 +9,11 @@ output/
 .DS_Store
 .playwright-cli/
 *.tsbuildinfo
+
+# Local Android toolchain, signing material and generated packages
+.toolchain/
+android-offline/build/
+android-offline/*.apk
+android-offline/*.idsig
+
+__pycache__/

@@ -43,6 +43,8 @@ def allowed(rel: Path) -> bool:
         return False
     if len(p) == 1:
         return name in TOP
+    if p[0] == "android-offline":
+        return name in {"android-offline/AndroidManifest.xml", "android-offline/README.md", "android-offline/package.py", "android-offline/smoke.mjs"} or (len(p) == 6 and p[1:5] == ("src", "org", "wordatlas", "offline") and rel.suffix == ".java") or (len(p) == 4 and p[1] == "res" and rel.suffix in {".png", ".xml"})
     if p[0] == "src":
         return rel.suffix in {".ts", ".tsx", ".css", ".svg"}
     if p[0] == "scripts":

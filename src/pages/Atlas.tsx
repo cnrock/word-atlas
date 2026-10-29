@@ -188,7 +188,9 @@ export function AtlasPage({
           )}
           <span className="result-count">
             {view === "galaxy"
-              ? "搜索一个词，星图会带你飞过去"
+              ? q.trim()
+                ? `${list.length.toLocaleString()} 个结果 · 点击下方词条查看介绍`
+                : "搜索一个词，星图会带你飞过去"
               : `${list.length.toLocaleString()} 个结果`}
           </span>
           <div
@@ -225,7 +227,18 @@ export function AtlasPage({
       </div>
 
       {view === "galaxy" ? (
-        <Galaxy mode="full" focus={q.trim() ? list[0]?.id : null} />
+        <>
+          {q.trim() && (
+            <div className="galaxy-search-results" aria-label="星图搜索结果">
+              {list.length ? list.slice(0, 12).map((w) => (
+                <button key={w.id} className="chip-btn" onClick={() => openWord(w.id)}>
+                  <span lang="en">{w.word}</span> · {w.zh}
+                </button>
+              )) : <p>没有找到「{q.trim()}」，换个词试试。</p>}
+            </div>
+          )}
+          <Galaxy mode="full" focus={q.trim() ? list[0]?.id : null} />
+        </>
       ) : list.length === 0 ? (
         <div className="empty">
           <img src={`${import.meta.env.BASE_URL}brand/empty.webp`} alt="" />

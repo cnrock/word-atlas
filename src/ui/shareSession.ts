@@ -79,8 +79,12 @@ export async function shareSession(atlas: Atlas, s: ActiveSession) {
     const blob = await new Promise<Blob | null>((r) => c.toBlob(r, "image/png"));
     if (!blob) throw new Error();
     const file = new File([blob], `word-atlas-${d.toISOString().slice(0, 10)}.png`, { type: "image/png" });
+    if (window.WordAtlasAndroid) {
+      window.WordAtlasAndroid.shareImage(c.toDataURL("image/png"), file.name);
+      return;
+    }
     if (navigator.canShare?.({ files: [file] })) {
-      await navigator.share({ files: [file] }).catch(() => null);
+      await navigator.share({ files: [file] });
       return;
     }
     const a = document.createElement("a");

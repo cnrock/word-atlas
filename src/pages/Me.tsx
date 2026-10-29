@@ -34,7 +34,12 @@ export function Me({ privateAvailable }: { privateAvailable: boolean }) {
 
   const set = (patch: Partial<Settings>) => store.settings(patch);
   const download = () => {
-    const blob = new Blob([exportBackup()], { type: "application/json" });
+    const backup = exportBackup();
+    if (window.WordAtlasAndroid) {
+      window.WordAtlasAndroid.saveBackup(backup);
+      return;
+    }
+    const blob = new Blob([backup], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = `word-atlas-backup-${dayKey()}.json`;

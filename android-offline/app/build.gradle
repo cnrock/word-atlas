@@ -1,0 +1,27 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'org.wordatlas.offline'
+    compileSdk 36
+    defaultConfig {
+        applicationId 'org.wordatlas.offline'
+        minSdk 23
+        targetSdk 36
+        versionCode 7
+        versionName '1.0.6'
+    }
+    assetPacks = [':webassets']
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    sourceSets {
+        main {
+            manifest.srcFile '../AndroidManifest.xml'
+            java.srcDirs = ['../src']
+            res.srcDirs = ['../res']
+        }
+    }
+}

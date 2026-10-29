@@ -15,5 +15,11 @@ output/
 android-offline/build/
 android-offline/*.apk
 android-offline/*.idsig
+android-offline/.gradle/
+android-offline/app/build/
+android-offline/webassets/build/
+android-offline/webassets/src/main/assets/web/
+android-offline/local.properties
+android-offline/vite-build.log
 
 __pycache__/

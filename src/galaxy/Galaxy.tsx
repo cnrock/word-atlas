@@ -8,6 +8,7 @@ import { isMastered } from "../store/srs";
 import { store, useStore } from "../store/store";
 import { Illustration } from "../ui/Illustration";
 import { detectQuality, GalaxyEngine } from "./engine";
+import { isTap, TAP_SLOP } from "./gesture";
 import { layoutGalaxy, TOPIC_COLORS, type GalaxyLayout } from "./layout";
 import { shareGalaxy } from "./share";
 
@@ -168,7 +169,7 @@ export function Galaxy({
   }, [mode]);
 
   /* ---------- interaction (full mode) ---------- */
-  const drag = useRef<{ x: number; y: number; moved: number; pinch?: number } | null>(null);
+  const drag = useRef<{ x: number; y: number; dragged: boolean; multiTouch: boolean; pinch?: number } | null>(null);
   const pointers = useRef(new Map<number, { x: number; y: number }>());
   const lastTwinkle = useRef(0);
   const dwell = useRef(0);
@@ -188,6 +189,7 @@ export function Galaxy({
       const prev = ps.get(e.pointerId)!;
       ps.set(e.pointerId, p);
       if (ps.size === 2) {
+        if (drag.current) drag.current.multiTouch = true;
         const [a, b] = [...ps.values()];
         const dist = Math.hypot(a.x - b.x, a.y - b.y);
         if (drag.current?.pinch) eng.cam.dist = clampDist(eng.cam.dist * (drag.current.pinch / dist));
@@ -195,9 +197,10 @@ export function Galaxy({
         return;
       }
       if (drag.current) {
+        if (!drag.current.dragged && Math.hypot(p.x - drag.current.x, p.y - drag.current.y) > TAP_SLOP) drag.current.dragged = true;
+        if (!drag.current.dragged) return;
         const dx = p.x - prev.x;
         const dy = p.y - prev.y;
-        drag.current.moved += Math.abs(dx) + Math.abs(dy);
         eng.cam.yaw -= dx * 0.006;
         eng.cam.pitch = Math.max(0.12, Math.min(1.45, eng.cam.pitch + dy * 0.005));
       }
@@ -228,7 +231,11 @@ export function Galaxy({
   const onDown = (e: React.PointerEvent) => {
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
     pointers.current.set(e.pointerId, local(e));
-    drag.current = { ...local(e), moved: 0 };
+    if (drag.current) {
+      drag.current.multiTouch = true;
+      return;
+    }
+    drag.current = { ...local(e), dragged: false, multiTouch: false };
   };
 
   const onUp = (e: React.PointerEvent) => {
@@ -237,21 +244,21 @@ export function Galaxy({
     pointers.current.delete(e.pointerId);
     if (pointers.current.size) return;
     drag.current = null;
-    if (!eng || !d || d.moved > 8) return;
     const p = local(e);
-    const i = eng.pick(p.x, p.y, e.pointerType === "mouse" ? 16 : 26);
+    if (!eng || !d || d.dragged || !isTap(d, p, d.multiTouch)) return;
+    const i = eng.pick(p.x, p.y, e.pointerType === "mouse" ? 16 : 36);
     if (i < 0) return;
     const ref = atlas.words[i];
-    if (e.pointerType !== "mouse" && hover?.ref.id !== ref.id) {
-      // First tap previews, second tap opens.
-      eng.hover = i;
-      setHover({ ref, x: p.x, y: p.y });
-      if (store.get().settings.sfx) void cue("twinkle");
-      return;
-    }
     eng.flyTo(i);
     if (store.get().settings.sfx) void cue("fly");
-    window.setTimeout(() => openWord(ref.id), 350);
+    // Touch has no stable hover state. Open on the first completed tap;
+    // delaying navigation lets the preview disappear before the sheet opens.
+    openWord(ref.id);
+  };
+
+  const onCancel = (e: React.PointerEvent) => {
+    pointers.current.delete(e.pointerId);
+    drag.current = null;
   };
 
   const onWheel = (e: React.WheelEvent) => {
@@ -286,7 +293,7 @@ export function Galaxy({
         onPointerMove={onMove}
         onPointerDown={onDown}
         onPointerUp={onUp}
-        onPointerCancel={onUp}
+        onPointerCancel={onCancel}
         onPointerLeave={() => {
           if (engine.current) engine.current.hover = -1;
           setHover(null);
